@@ -4,12 +4,15 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 
 class StockData:
-    def __init__(self, tickers, start_date, end_date):
+    def __init__(self, tickers,market_ticker, start_date, end_date):
         self.tickers = tickers
+        self.market_ticker = market_ticker
         self.start_date = start_date
         self.end_date = end_date
         self.data = self.download_data()
         self.log_returns = self.calculate_log_returns()
+        self.market_data = self.download_market_data()
+        self.market_log_returns = self.calculate_market_log_returns()
     
     def download_data(self):
         data = {}
@@ -23,7 +26,14 @@ class StockData:
         for ticker, data in self.data.items():
             log_returns[ticker] = (np.log(data['Close']) - np.log(data['Close'].shift(1))).dropna()
         return log_returns
-        
+    
+    def download_market_data(self):
+        market_data = yf.download(self.market_ticker, start=self.start_date, end=self.end_date)
+        return market_data
+
+    def calculate_market_log_returns(self):
+        market_log_returns = (np.log(self.market_data['Close']) - np.log(self.market_data['Close'].shift(1))).dropna()
+        return market_log_returns
             
     
     def plot_prices(self):
