@@ -7,11 +7,15 @@ Create the following files:
 2. investment_policy.py
     - incorporate a risk profile questionare.
 3. stock_data.py
+    - add risk-free for the period. Annualize risk-free.
 4. financial_metrics.py
-    - added single index model and capm parameters
-    - market returns(SnP500) and risk free rate (3-month T bills) should be part of the instance of StockData.
+    - investigate the efficient_frontier method.
+    - 
 5. news_analysis.py
+    - NEXT-STEP
 6. report.py
+    - generates report that summarizes everything. 
+    - add excel writing functionality.
 7. requirements.txt
 8. .gitignore
 9. README.md
