@@ -3,12 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
 from typing import List
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import linregress
-from typing import List
 import yfinance as yf
 
 class StockAnalysis:
@@ -116,16 +110,20 @@ class StockAnalysis:
         cov_matrix = stock_returns.cov() * 252  # Annualized
 
         plt.figure(figsize=(10, 6))
-        portfolio_weights = np.linspace(0, 1, 101)
+        portfolio_weights = []
         portfolio_returns = []
         portfolio_risks = []
 
-        for weight in portfolio_weights:
-            weights = [weight, 1 - weight, 0, 0]
-            portfolio_return = np.dot(mean_returns, weights)
-            portfolio_risk = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights)))
-            portfolio_returns.append(portfolio_return)
-            portfolio_risks.append(portfolio_risk)
+        for weight1 in np.linspace(0, 1, 21):
+            for weight2 in np.linspace(0, 1 - weight1, 21):
+                for weight3 in np.linspace(0, 1 - weight1 - weight2, 21):
+                    weight4 = 1 - weight1 - weight2 - weight3
+                    weights = [weight1, weight2, weight3, weight4]
+                    portfolio_return = np.dot(mean_returns, weights)
+                    portfolio_risk = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights)))
+                    portfolio_weights.append(weights)
+                    portfolio_returns.append(portfolio_return)
+                    portfolio_risks.append(portfolio_risk)
 
         plt.scatter(portfolio_risks, portfolio_returns, c='r', marker='o')
         plt.xlabel('Risk (Standard Deviation)')
@@ -136,39 +134,42 @@ class StockAnalysis:
         optimal_index = np.argmax(np.array(portfolio_returns) / np.array(portfolio_risks))
         optimal_return = portfolio_returns[optimal_index]
         optimal_risk = portfolio_risks[optimal_index]
+        optimal_weights = portfolio_weights[optimal_index]
+
         print(f"\nOptimal portfolio allocation:")
         print(f"Expected return: {optimal_return:.2f}")
         print(f"Risk (Standard Deviation): {optimal_risk:.2f}")
+        print(f"Optimal weights: {optimal_weights}")
 
 if __name__ == '__main__':
     stocks = ['AAPL', 'MSFT', 'AMZN', 'GOOGL']
 
     analysis = StockAnalysis(stocks)
 
-    print("Investment Policy Statement:")
-    ips = analysis.investment_policy_statement()
-    print(ips)
+    #print("Investment Policy Statement:")
+    #ips = analysis.investment_policy_statement()
+    #print(ips)
 
-    print("\nSummary Statistics:")
-    analysis.summary_statistics()
+    #print("\nSummary Statistics:")
+    #analysis.summary_statistics()
 
-    print("\nDescriptive Statistics:")
-    analysis.descriptive_statistics()
+    #print("\nDescriptive Statistics:")
+    #analysis.descriptive_statistics()
 
-    print("\nAdditional Metrics:")
-    analysis.additional_metrics()
+    #print("\nAdditional Metrics:")
+    #analysis.additional_metrics()
 
-    print("\nCapital Allocation Lines:")
-    analysis.capital_allocation_lines()
+    #print("\nCapital Allocation Lines:")
+    #analysis.capital_allocation_lines()
 
-    print("\nNews Impact:")
-    analysis.news_impact()
+    #print("\nNews Impact:")
+    #analysis.news_impact()
 
-    print("\nCAPM Metrics:")
+    #print("\nCAPM Metrics:")
     analysis.capm_metrics()
 
-    print("\nStock Selection:")
-    analysis.stock_selection()
+    #print("\nStock Selection:")
+    #analysis.stock_selection()
 
     print("\nPortfolio Optimization:")
     analysis.portfolio_optimization()
