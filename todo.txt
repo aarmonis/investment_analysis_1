@@ -3,3 +3,7 @@
 3. Add report to main.py
 4. Work on News.
 5. NEW GIT, git ignore etc.
+6. Add price evolution.
+7. Open AI to explain price evolution with vision.
+8. https://hackingthemarkets.com/interactive-brokers-tws-api-tutorial/
+

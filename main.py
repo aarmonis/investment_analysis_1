@@ -26,8 +26,8 @@ def main():
             print("Exiting the program. Goodbye!")
             sys.exit(0)
         elif choice == '1':
-            ips = analysis.investment_policy_statement()
-            print("Investment Policy Statement:", ips)
+            p_evolution = analysis.plot_price_evolution()
+            print("Price Evolution:", p_evolution)
         elif choice == '2':
             analysis.summary_statistics()
         elif choice == '3':

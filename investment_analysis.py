@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 from typing import List
 import yfinance as yf
+import seaborn as sns
 
 class InvestmentAnalysis:
     def __init__(self, stocks: List[str]):
@@ -46,6 +47,63 @@ class InvestmentAnalysis:
             print(f"Standard deviation: {log_returns.std():.4f}")
             print(f"Skewness: {log_returns.skew():.4f}")
             print(f"Kurtosis: {log_returns.kurt():.4f}")
+            
+    def plot_price_evolution(self):
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
+        
+        # Plot 1: Price Evolution
+        for stock in self.stocks:
+            ax1.plot(self.data.index, self.data[stock], label=stock)
+        
+        ax1.set_title('Price Evolution of Stocks')
+        ax1.set_ylabel('Price')
+        ax1.legend()
+        ax1.grid(True)
+
+        # Plot 2: Normalized Price Evolution (Starting from 100)
+        normalized_data = self.data / self.data.iloc[0] * 100
+        for stock in self.stocks:
+            ax2.plot(normalized_data.index, normalized_data[stock], label=stock)
+        
+        ax2.set_title('Normalized Price Evolution (Starting from 100)')
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('Normalized Price')
+        ax2.legend()
+        ax2.grid(True)
+
+        plt.tight_layout()
+        plt.show()
+
+        # Calculate and print additional metrics
+        print("\nPrice Evolution Metrics:")
+        for stock in self.stocks:
+            stock_data = self.data[stock]
+            overall_return = (stock_data.iloc[-1] / stock_data.iloc[0] - 1) * 100
+            max_price = stock_data.max()
+            min_price = stock_data.min()
+            current_price = stock_data.iloc[-1]
+            drawdown = ((max_price - current_price) / max_price) * 100
+            volatility = stock_data.pct_change().std() * (252 ** 0.5) * 100  # Annualized volatility
+
+            print(f"\n{stock}:")
+            print(f"  Overall Return: {overall_return:.2f}%")
+            print(f"  Max Price: ${max_price:.2f}")
+            print(f"  Min Price: ${min_price:.2f}")
+            print(f"  Current Price: ${current_price:.2f}")
+            print(f"  Drawdown from Peak: {drawdown:.2f}%")
+            print(f"  Annualized Volatility: {volatility:.2f}%")
+
+        # Calculate and print correlation matrix
+        correlation_matrix = self.data.pct_change().corr()
+        print("\nCorrelation Matrix:")
+        print(correlation_matrix)
+
+        # Plot correlation heatmap
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)
+        plt.title('Stock Price Movement Correlation Heatmap')
+        plt.tight_layout()
+        plt.show()
 
     def additional_metrics(self):
         corr_matrix = self.log_returns.corr()
