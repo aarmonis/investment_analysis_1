@@ -5,6 +5,9 @@ from scipy.stats import linregress
 from typing import List
 import yfinance as yf
 import seaborn as sns
+import os
+import time
+
 
 class InvestmentAnalysis:
     def __init__(self, stocks: List[str]):
@@ -47,8 +50,82 @@ class InvestmentAnalysis:
             print(f"Standard deviation: {log_returns.std():.4f}")
             print(f"Skewness: {log_returns.skew():.4f}")
             print(f"Kurtosis: {log_returns.kurt():.4f}")
+ 
+
+    def plot_and_save_all(self):
+        # Ensure the screenshots directory exists
+        if not os.path.exists('screenshots'):
+            os.makedirs('screenshots')
+
+        t = time.time()
+        saved_files = []
+
+        # 1. Price Evolution Plot
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
+        
+        for stock in self.stocks:
+            ax1.plot(self.data.index, self.data[stock], label=stock)
+        
+        ax1.set_title('Price Evolution of Stocks')
+        ax1.set_ylabel('Price')
+        ax1.legend()
+        ax1.grid(True)
+
+        normalized_data = self.data / self.data.iloc[0] * 100
+        for stock in self.stocks:
+            ax2.plot(normalized_data.index, normalized_data[stock], label=stock)
+        
+        ax2.set_title('Normalized Price Evolution (Starting from 100)')
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('Normalized Price')
+        ax2.legend()
+        ax2.grid(True)
+
+        plt.tight_layout()
+        price_evolution_filename = f"screenshots/price_evolution-{t}.png"
+        plt.savefig(price_evolution_filename, dpi=300, bbox_inches='tight')
+        plt.close(fig)
+        saved_files.append(price_evolution_filename)
+
+        # 2. Correlation Heatmap
+        correlation_matrix = self.data.pct_change().corr()
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)
+        plt.title('Stock Price Movement Correlation Heatmap')
+        correlation_filename = f"screenshots/correlation_heatmap-{t}.png"
+        plt.savefig(correlation_filename, dpi=300, bbox_inches='tight')
+        plt.close()
+        saved_files.append(correlation_filename)
+
+        # 3. Individual Stock Performance
+        for stock in self.stocks:
+            plt.figure(figsize=(10, 6))
+            plt.plot(self.data.index, self.data[stock])
+            plt.title(f'{stock} Price Evolution')
+            plt.xlabel('Date')
+            plt.ylabel('Price')
+            plt.grid(True)
+            stock_filename = f"screenshots/{stock}_evolution-{t}.png"
+            plt.savefig(stock_filename, dpi=300, bbox_inches='tight')
+            plt.close()
+            saved_files.append(stock_filename)
+
+        print(f"All plots saved. Files created:")
+        for file in saved_files:
+            print(f"- {file}")
+
+        return saved_files
+        
             
     def plot_price_evolution(self):
+        
+        # Ensure the screenshots directory exists
+        if not os.path.exists('screenshots'):
+            os.makedirs('screenshots')
+
+        t = time.time()
+        saved_files = []
+        
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
         
         # Plot 1: Price Evolution
@@ -73,6 +150,9 @@ class InvestmentAnalysis:
 
         plt.tight_layout()
         plt.show()
+        price_evolution_filename = f"screenshots/fix_price_evolution-{t}.png"
+        plt.savefig(price_evolution_filename, dpi=300, bbox_inches='tight')
+        saved_files.append(price_evolution_filename)
 
         # Calculate and print additional metrics
         print("\nPrice Evolution Metrics:")
@@ -104,6 +184,9 @@ class InvestmentAnalysis:
         plt.title('Stock Price Movement Correlation Heatmap')
         plt.tight_layout()
         plt.show()
+        
+        return saved_files
+        
 
     def additional_metrics(self):
         corr_matrix = self.log_returns.corr()
